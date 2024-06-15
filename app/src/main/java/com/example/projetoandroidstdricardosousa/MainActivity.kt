@@ -1,25 +1,37 @@
-@file:Suppress("CAST_NEVER_SUCCEEDS")
-
 package com.example.projetoandroidstdricardosousa
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.projetoandroidstdricardosousa.ui.theme.ProjectGameTheme
 import kotlin.system.exitProcess
 
+var Option: Int = 2
+
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -32,13 +44,14 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MyApp() {
+
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = "main") {
         composable("main") {
             MainScreen(
                 navigateToScreen1 = { navController.navigate("screen1") },
                 navigateToScreen2 = { navController.navigate("screen2") },
-                exitApp = { (it as ComponentActivity).finishAffinity() }
+                exitApp = { exitApplication() }
             )
         }
         composable("screen1") {
@@ -47,13 +60,19 @@ fun MyApp() {
         composable("screen2") {
             Screen2(navigateBack = { navController.popBackStack() })
         }
-
-
     }
 }
 
+fun exitApplication() {
+    exitProcess(0)
+}
+
 @Composable
-fun MainScreen(navigateToScreen1: () -> Unit, navigateToScreen2: () -> Unit, exitApp:() -> Unit) {
+fun MainScreen(
+    navigateToScreen1: () -> Unit,
+    navigateToScreen2: () -> Unit,
+    exitApp: () -> Unit
+) {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -75,16 +94,29 @@ fun MainScreen(navigateToScreen1: () -> Unit, navigateToScreen2: () -> Unit, exi
 
 @Composable
 fun Screen1(navigateBack: () -> Unit) {
+    when (Option) {
+        1 -> {
+            // diceFour()
+        }
+        2 -> {
+            DiceSix()
+        }
+        3 -> {
+            // diceTwenty()
+        }
+    }
+
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Bottom
     ) {
-        Text("This is Screen 1")
+        Text("Valor: " + player1.score)
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = navigateBack) {
             Text("Back to Main Screen")
         }
+        Spacer(modifier = Modifier.height(40.dp))
     }
 }
 
@@ -127,3 +159,45 @@ fun PreviewScreen2() {
     }
 }
 
+@Composable
+fun DiceSix(modifier: Modifier = Modifier) {
+    var result by remember { mutableStateOf(1) }
+    val imageResource = when (result) {
+        1 -> R.drawable.dice_1
+        2 -> R.drawable.dice_2
+        3 -> R.drawable.dice_3
+        4 -> R.drawable.dice_4
+        5 -> R.drawable.dice_5
+        else -> R.drawable.dice_6
+    }
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Image(
+            painter = painterResource(imageResource),
+            contentDescription = result.toString()
+        )
+
+        Button(
+            onClick = {
+                result = (1..6).random()
+                getDiceValue(player = player1, roll = result)
+            },
+        ) {
+            Text(text = "Roll", fontSize = 24.sp)
+        }
+    }
+}
+
+class Player {
+    var score by mutableStateOf(0)
+}
+
+val player1 = Player()
+val player2 = Player()
+
+fun getDiceValue(player: Player, roll: Int) {
+    player.score += roll
+}
