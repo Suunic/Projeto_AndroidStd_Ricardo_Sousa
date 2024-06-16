@@ -1,15 +1,22 @@
 package com.example.projetoandroidstdricardosousa
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,6 +34,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.projetoandroidstdricardosousa.ui.theme.ProjectGameTheme
 import kotlin.system.exitProcess
+
 
 var Option: Int = 2
 
@@ -94,6 +102,38 @@ fun MainScreen(
 
 @Composable
 fun Screen1(navigateBack: () -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(end = 16.dp),
+        horizontalAlignment = Alignment.End,
+        verticalArrangement = Arrangement.Top,
+    ) {
+        Spacer(modifier = Modifier.height(16.dp))
+        Box(modifier = Modifier.height(40.dp)){
+            Button(onClick = { expanded = true }) {
+                Text("Options")
+            }
+
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier
+                    .padding(vertical = 2.dp)
+                    .width(IntrinsicSize.Max)
+            ) {
+
+                DropdownMenuItem(text = { Text("D4") }, onClick = { Option=1; Log.d("TAG", "Option changed to $Option") })
+                DropdownMenuItem(text = { Text("D6") }, onClick = { Option=2; Log.d("TAG", "Option changed to $Option") })
+                DropdownMenuItem(text = { Text("D20") }, onClick = { Option=3; Log.d("TAG", "Option changed to $Option") })
+
+            }
+        }
+
+        Spacer(modifier = Modifier.padding(end = 16.dp))
+    }
+    Spacer(modifier = Modifier.padding(end = 16.dp))
     when (Option) {
         1 -> {
             // diceFour()
@@ -201,3 +241,4 @@ val player2 = Player()
 fun getDiceValue(player: Player, roll: Int) {
     player.score += roll
 }
+
