@@ -38,6 +38,7 @@ import kotlin.system.exitProcess
 
 var Option: Int = 2
 
+
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -124,8 +125,8 @@ fun Screen1(navigateBack: () -> Unit) {
                     .width(IntrinsicSize.Max)
             ) {
 
-                DropdownMenuItem(text = { Text("D4") }, onClick = { Option=1; Log.d("TAG", "Option changed to $Option") })
-                DropdownMenuItem(text = { Text("D6") }, onClick = { Option=2; Log.d("TAG", "Option changed to $Option") })
+                DropdownMenuItem(text = { Text("D4" ) }, onClick = { Option=1; Log.d("TAG", "Option changed to $Option") })
+                DropdownMenuItem(text = { Text("D6" ) }, onClick = { Option=2; Log.d("TAG", "Option changed to $Option") })
                 DropdownMenuItem(text = { Text("D20") }, onClick = { Option=3; Log.d("TAG", "Option changed to $Option") })
 
             }
@@ -136,13 +137,13 @@ fun Screen1(navigateBack: () -> Unit) {
     Spacer(modifier = Modifier.padding(end = 16.dp))
     when (Option) {
         1 -> {
-            // diceFour()
+            // diceFour(1, player1)
         }
         2 -> {
-            DiceSix()
+            DiceSix(1, player1)
         }
         3 -> {
-            // diceTwenty()
+            // diceTwenty(1, player1)
         }
     }
 
@@ -151,7 +152,9 @@ fun Screen1(navigateBack: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Bottom
     ) {
-        Text("Valor: " + player1.score)
+        Text("Player 1: " + player1.score)
+        Spacer(modifier = Modifier.height(16.dp))
+        Text("Player 2(Bot): " + player2.score)
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = navigateBack) {
             Text("Back to Main Screen")
@@ -162,16 +165,63 @@ fun Screen1(navigateBack: () -> Unit) {
 
 @Composable
 fun Screen2(navigateBack: () -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(end = 16.dp),
+        horizontalAlignment = Alignment.End,
+        verticalArrangement = Arrangement.Top,
+    ) {
+        Spacer(modifier = Modifier.height(16.dp))
+        Box(modifier = Modifier.height(40.dp)){
+            Button(onClick = { expanded = true }) {
+                Text("Options")
+            }
+
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier
+                    .padding(vertical = 2.dp)
+                    .width(IntrinsicSize.Max)
+            ) {
+
+                DropdownMenuItem(text = { Text("D4" ) }, onClick = { Option=1; Log.d("TAG", "Option changed to $Option") })
+                DropdownMenuItem(text = { Text("D6" ) }, onClick = { Option=2; Log.d("TAG", "Option changed to $Option") })
+                DropdownMenuItem(text = { Text("D20") }, onClick = { Option=3; Log.d("TAG", "Option changed to $Option") })
+
+            }
+        }
+
+        Spacer(modifier = Modifier.padding(end = 16.dp))
+    }
+    Spacer(modifier = Modifier.padding(end = 16.dp))
+    when (Option) {
+        1 -> {
+            // diceFour(1, player1)
+        }
+        2 -> {
+            DiceSix(2, player1)
+        }
+        3 -> {
+            // diceTwenty(1, player1)
+        }
+    }
+
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Bottom
     ) {
-        Text("This is Screen 2")
+        Text("Player 1: " + player1.score)
+        Spacer(modifier = Modifier.height(16.dp))
+        Text("Player 2(Bot): " + player2.score)
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = navigateBack) {
             Text("Back to Main Screen")
         }
+        Spacer(modifier = Modifier.height(40.dp))
     }
 }
 
@@ -200,9 +250,13 @@ fun PreviewScreen2() {
 }
 
 @Composable
-fun DiceSix(modifier: Modifier = Modifier) {
+fun DiceSix( playerSelect: Int, player: Player) {
     var result by remember { mutableStateOf(1) }
+    var textRoll by remember { mutableStateOf("Player 1") }
+    var currentPlayer by remember { mutableStateOf(player1) }
+
     val imageResource = when (result) {
+
         1 -> R.drawable.dice_1
         2 -> R.drawable.dice_2
         3 -> R.drawable.dice_3
@@ -223,10 +277,36 @@ fun DiceSix(modifier: Modifier = Modifier) {
         Button(
             onClick = {
                 result = (1..6).random()
-                getDiceValue(player = player1, roll = result)
+                if (playerSelect == 1) {
+                    textRoll = "Player 1"
+                    getDiceValue(player = player1, roll = result)
+                    result = (1..6).random()
+                    getDiceValue(player = player2, roll = result)
+
+                } else {
+                    textRoll = if (currentPlayer == player1) "Player 1" else "Player 2"
+                    getDiceValue(player = currentPlayer, roll = result)
+                    if (currentPlayer == player1) {
+                        currentPlayer = player2
+
+                    } else {
+                        currentPlayer = player1
+
+                    }
+                }
             },
+
         ) {
-            Text(text = "Roll", fontSize = 24.sp)
+            Text("Roll($textRoll)", fontSize = 24.sp)
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(
+            onClick = {
+                //Stop
+            }
+
+        ){
+            Text(text = "Stop", fontSize = 24.sp)
         }
     }
 }
