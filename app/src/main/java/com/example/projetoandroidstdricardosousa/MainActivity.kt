@@ -1,5 +1,6 @@
 package com.example.projetoandroidstdricardosousa
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -22,9 +24,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -39,17 +43,18 @@ import kotlin.system.exitProcess
 var Option: Int = 6
 var Value:  Int = 21
 
-
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             ProjectGameTheme {
                 MyApp()
             }
         }
     }
+
 }
 
 @Composable
@@ -86,29 +91,53 @@ fun MainScreen(
     navigateToScreen1: () -> Unit,
     navigateToScreen2: () -> Unit,
     navigateToScreen3: () -> Unit,
-
-
     exitApp: () -> Unit
 ) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Button(onClick = navigateToScreen1) {
-            Text("1 Player")
+    val configuration = LocalConfiguration.current
+
+    if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        Row(
+            modifier = Modifier.fillMaxSize(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Button(onClick = navigateToScreen1) {
+                Text("1 Player")
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+            Button(onClick = navigateToScreen2) {
+                Text("2 Players")
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+            Button(onClick = navigateToScreen3) {
+                Text("Options")
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+            Button(onClick = exitApp) {
+                Text("Exit")
+            }
         }
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = navigateToScreen2) {
-            Text("2 Players")
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = navigateToScreen3) {
-            Text("Options")
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = exitApp) {
-            Text("Exit")
+    } else {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Button(onClick = navigateToScreen1) {
+                Text("1 Player")
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(onClick = navigateToScreen2) {
+                Text("2 Players")
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(onClick = navigateToScreen3) {
+                Text("Options")
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(onClick = exitApp) {
+                Text("Exit")
+            }
         }
     }
 }
@@ -137,7 +166,7 @@ fun Screen1(navigateBack: () -> Unit) {
                     .width(IntrinsicSize.Max)
             ) {
 
-                DropdownMenuItem(text = { Text("D4" ) }, onClick = { Option=4; Log.d("TAG", "Option changed to $Option") })
+
                 DropdownMenuItem(text = { Text("D6" ) }, onClick = { Option=6; Log.d("TAG", "Option changed to $Option") })
                 DropdownMenuItem(text = { Text("D20") }, onClick = { Option=20; Log.d("TAG", "Option changed to $Option") })
 
@@ -148,9 +177,7 @@ fun Screen1(navigateBack: () -> Unit) {
     }
     Spacer(modifier = Modifier.padding(end = 16.dp))
     when (Option) {
-        4 -> {
-            // diceFour(1, player1)
-        }
+
         6 -> {
             DiceSix(1, Value)
         }
@@ -200,7 +227,7 @@ fun Screen2(navigateBack: () -> Unit) {
                     .width(IntrinsicSize.Max)
             ) {
 
-                DropdownMenuItem(text = { Text("D4" ) }, onClick = { Option=4; Log.d("TAG", "Option changed to $Option") })
+
                 DropdownMenuItem(text = { Text("D6" ) }, onClick = { Option=6; Log.d("TAG", "Option changed to $Option") })
                 DropdownMenuItem(text = { Text("D20") }, onClick = { Option=20; Log.d("TAG", "Option changed to $Option") })
 
@@ -260,7 +287,7 @@ fun Screen3(navigateBack: () -> Unit) {
                 onDismissRequest = { expanded = false },
                 modifier = Modifier.width(IntrinsicSize.Max)
             ) {
-                DropdownMenuItem(text = { Text("D4" ) }, onClick = { Option=4; Log.d("TAG", "Option changed to $Option") })
+
                 DropdownMenuItem(text = { Text("D6" ) }, onClick = { Option=6; Log.d("TAG", "Option changed to $Option") })
                 DropdownMenuItem(text = { Text("D20") }, onClick = { Option=20; Log.d("TAG", "Option changed to $Option") })
 
@@ -314,7 +341,7 @@ fun PreviewScreen2() {
 
 @Composable
 fun DiceSix( playerSelect: Int, value: Int) {
-    var checkValue by remember { mutableStateOf(false) }
+    var checkValue by rememberSaveable { mutableStateOf(false) }
     var result by remember { mutableStateOf(1) }
     var textRoll by remember { mutableStateOf("Player 1") }
     var currentPlayer by remember { mutableStateOf(player1) }
@@ -390,7 +417,7 @@ fun DiceSix( playerSelect: Int, value: Int) {
 
 @Composable
 fun DiceTwenty( playerSelect: Int, value: Int) {
-    var checkValue by remember { mutableStateOf(false) }
+    var checkValue by rememberSaveable { mutableStateOf(false) }
     var result by remember { mutableStateOf(1) }
     var textRoll by remember { mutableStateOf("Player 1") }
     var currentPlayer by remember { mutableStateOf(player1) }
@@ -492,7 +519,7 @@ fun getDiceValue(player: Player, roll: Int) {
 
 @Composable
 fun NumberPicker(value: Int, onValueChange: (Int) -> Unit, range: IntRange) {
-    var currentValue by remember { mutableStateOf(value) }
+    var currentValue by rememberSaveable { mutableStateOf(value) }
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Button(onClick = { if (currentValue > range.first) currentValue--; onValueChange(currentValue) }) {
