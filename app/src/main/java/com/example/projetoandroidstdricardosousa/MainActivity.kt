@@ -497,7 +497,7 @@ fun Screen2(navigateBack: () -> Unit) {var expanded by remember { mutableStateOf
 @Composable
 fun Screen3(navigateBack: () -> Unit) {
     var expanded by remember { mutableStateOf(false) }
-    var customValue by remember { mutableStateOf(Value) }
+    var customValue by rememberSaveable { mutableStateOf(Value) }
 
     Column(
         modifier = Modifier
